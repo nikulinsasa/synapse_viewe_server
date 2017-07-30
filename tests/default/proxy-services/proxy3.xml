@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proxy name="StockQuoteProxy3">
+	<target>
+		<inSequence>
+			<property name="preserveProcessedHeaders" value="true" />
+			<property name="hi" value="true" />
+			<sequence key="{get-property('hi')}" />
+		</inSequence>
+		<outSequence>
+			<send />
+		</outSequence>
+	</target>
+	<publishWSDL
+		uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl" />
+</proxy>

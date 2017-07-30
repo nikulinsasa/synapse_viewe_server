@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="stockquote">
+	<!-- log the message using the custom log level. illustrates custom properties 
+		for log -->
+	<log level="custom">
+		<property name="Text" value="Sending quote request" />
+		<property name="version" expression="get-property('version')" />
+		<property name="direction" expression="get-property('direction')" />
+	</log>
+	<!-- send message to real endpoint referenced by key "simple" endpoint definition -->
+	<send>
+		<endpoint key="simple" />
+	</send>
+</sequence>

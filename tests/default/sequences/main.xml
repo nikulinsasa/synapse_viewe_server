@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="main" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+	<in>
+		<property name="direction" value="incoming" />
+		<sequence key="stockquote" />
+	</in>
+	<out>
+		<send />
+	</out>
+</sequence>

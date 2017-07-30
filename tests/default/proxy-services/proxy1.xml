@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<proxy name="StockQuoteProxy1">
+	<target>
+		<endpoint>
+			<address uri="http://localhost:9000/services/SimpleStockQuoteService" />
+		</endpoint>
+		<outSequence>
+			<log level="full" />
+			<log level="full" />
+			<send />
+		</outSequence>
+	</target>
+	<publishWSDL
+		uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl" />
+</proxy>

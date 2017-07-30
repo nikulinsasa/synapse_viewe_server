@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoint name="simple">
+	<address uri="http://localhost:9000/services/SimpleStockQuoteService" />
+</endpoint>
