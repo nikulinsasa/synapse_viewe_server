@@ -12,6 +12,8 @@ public interface ISynapseStorage {
 	
 	public List<String> findNameList(String type) throws StorageException;
 	
+	public List<SynapseElement> searchByName(String term) throws StorageException;
+	
 	public void clearStorage() throws StorageException;
 	
 }

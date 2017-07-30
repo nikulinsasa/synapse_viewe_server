@@ -30,6 +30,10 @@ public class StorageSQLLiteTest {
 		
 		assertEquals(se.getXml(), p2.getXml());
 		
+		SynapseElement p3 = storage.searchByName("storage").get(0);
+		
+		assertEquals(se.getXml(), p3.getXml());
+		
 		dbc.delete(Collections.singletonMap("name", "storageTest1"));
 		
 	}

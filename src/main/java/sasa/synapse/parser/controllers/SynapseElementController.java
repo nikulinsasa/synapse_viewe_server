@@ -9,11 +9,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import sasa.authorization.jersey.Security;
+import sasa.synapse.parser.entities.SynapseElement;
 import sasa.synapse.parser.storage.ISynapseStorage;
 import sasa.synapse.parser.storage.StorageException;
 
@@ -62,6 +64,28 @@ public class SynapseElementController {
 			return storage.findSynapseElementByName(name).getXml();
 		}catch(NullPointerException ne){
 			return "<error>Не найден элемент с именем "+name+"</error>";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "<error>Произошла неожиданная ошибка</error>";
+		}
+	}
+	
+	@GET
+	@Path("/search")
+	@Produces("text/xml")
+	public String searchElement(@QueryParam("term") String term) {
+		try {
+			StringBuffer result = new StringBuffer("<elements>");
+			List<SynapseElement> elements = storage.searchByName(term);
+			for(SynapseElement item : elements){
+				result.append("<item>");
+				result.append(item.getXml());
+				result.append("</item>");
+			}
+			result.append("</elements>");
+			return result.toString();
+		}catch(NullPointerException ne){
+			return "<error>Результат поиска по "+term+" не дал результатов</error>";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "<error>Произошла неожиданная ошибка</error>";

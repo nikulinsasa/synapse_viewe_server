@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.Where;
 
 import sasa.synapse.parser.entities.SynapseElement;
 import sasa.synapse.parser.storage.ISynapseStorage;
@@ -67,6 +70,21 @@ public class StorageSQLLite implements ISynapseStorage {
 			connector.deleteAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new StorageException(e.getMessage());
+		}
+	}
+
+
+	@Override
+	public List<SynapseElement> searchByName(String term) throws StorageException {
+		QueryBuilder<SynapseElement, String> qb =  connector.createQueryBuilder();
+		SelectArg arg = new SelectArg();
+		arg.setValue("%"+term+"%");
+		Where<SynapseElement, String> _where = qb.where();
+		try {
+			_where.like("name", arg);
+			return qb.query();
+		} catch (SQLException e) {
 			throw new StorageException(e.getMessage());
 		}
 	}

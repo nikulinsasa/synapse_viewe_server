@@ -10,6 +10,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -50,12 +51,19 @@ public class DBConnector<T> {
     public void insert() throws SQLException{
     	dao.createOrUpdate(object);
     }
+    
+    public void update(T object, String id) throws SQLException {
+    	dao.createOrUpdate(object);
+    	dao.clearObjectCache();
+    }
 	
     public List<T> find(Map<String, Object> map) throws SQLException {
+    	dao.clearObjectCache();
     	return createQuery(map).query();
     }
     
     public T findOne(Map<String, Object> map) throws SQLException {
+    	dao.clearObjectCache();
     	return createQuery(map).queryForFirst();
     }
     
@@ -68,6 +76,10 @@ public class DBConnector<T> {
         	arg.setValue(_entry.getValue());
     	}
     	return queryBuilder;
+    }
+    
+    public QueryBuilder<T, String> createQueryBuilder() {
+    	return dao.queryBuilder();
     }
     
     public void delete(Map<String, Object> map) throws SQLException {
