@@ -21,7 +21,7 @@ import sasa.synapse.parser.CrossDomainFilter;
 public class ServicesTest extends JerseyTest {
 
 	@Override
-    protected Application configure() {
+	protected Application configure() {
 		ResourceConfig resourceConfig = new ResourceConfig();
 		try {
 			resourceConfig.register(new BinderOnlySqlLite());
@@ -33,21 +33,29 @@ public class ServicesTest extends JerseyTest {
 		resourceConfig.register(SecurityFilter.class);
 		resourceConfig.packages("sasa.synapse.parser.controllers");
 		resourceConfig.packages("sasa.authorization.jersey.controllers");
-        return resourceConfig;
-    }
-	
+		return resourceConfig;
+	}
+
 	@Test
 	public void test() {
 		JSONObject request = new JSONObject();
 		request.put("user", "test");
 		request.put("password", "test");
 		Response answer = target("auth").request().post(Entity.text(request.toString()));
-		JSONObject obj = new JSONObject( answer.readEntity(String.class) );
-		
-		
+		JSONObject obj = new JSONObject(answer.readEntity(String.class));
+
 		Response r = target("/service/update-proxy").request().header("Authorization", obj.getString("token")).get();
-		assertEquals("<ok/>",r.readEntity(String.class));
+		assertEquals("<ok/>", r.readEntity(String.class));
+
+		r = target("/element/list/proxy").request().header("Authorization", obj.getString("token")).get();
 		
+		JSONObject proxyList = new JSONObject(r.readEntity(String.class));
+		assertEquals(3, proxyList.getJSONArray("names").length());
+		
+		r = target("/element/list/sequency").request().header("Authorization", obj.getString("token")).get();
+		JSONObject sequenciesList = new JSONObject(r.readEntity(String.class));
+		assertEquals(3, sequenciesList.getJSONArray("names").length());
+		System.out.println(sequenciesList);
 	}
 
 }

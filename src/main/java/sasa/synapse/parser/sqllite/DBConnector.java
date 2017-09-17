@@ -15,11 +15,13 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import sasa.synapse.parser.entities.DependencySynapseElements;
+
 public class DBConnector<T> {
 
 	public static final String url = "jdbc:sqlite:main.sqlite";
 	
-	private ConnectionSource source;
+	private JdbcConnectionSource source;
     
 	private Dao<T, String> dao;
 	
@@ -39,7 +41,11 @@ public class DBConnector<T> {
         dao = (Dao<T, String>) DaoManager.createDao(this.source,object.getClass());
     }
  
-    public void createTable() throws SQLException {
+	public JdbcConnectionSource getSource() {
+		return source;
+	}
+
+	public void createTable() throws SQLException {
     	TableUtils.createTableIfNotExists(source, object.getClass());
     }
     

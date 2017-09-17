@@ -10,24 +10,34 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 
+import sasa.synapse.parser.entities.DependencySynapseElements;
 import sasa.synapse.parser.entities.SynapseElement;
 import sasa.synapse.parser.storage.ISynapseStorage;
+import sasa.synapse.parser.storage.MediatorItem;
 import sasa.synapse.parser.storage.StorageException;
 
 public class StorageSQLLite implements ISynapseStorage {
 
 	private DBConnector<SynapseElement> connector;
-	
-	public StorageSQLLite(DBConnector<SynapseElement> se) throws SQLException{
-		connector = se;
-		se.createTable();
-	}
+	private DBConnector<DependencySynapseElements> depConnector;
 
+	public StorageSQLLite(DBConnector<SynapseElement> se) throws SQLException {
+		connector = se;
+		depConnector = new DBConnector<DependencySynapseElements>(new DependencySynapseElements(), se.getSource());
+		se.createTable();
+		depConnector.createTable();
+	}
 
 	@Override
 	public void saveElement(SynapseElement se) throws StorageException {
 		try {
 			connector.insert(se);
+			if (se.hasParent()) {
+				Iterator<DependencySynapseElements> parents = se.getArrayParents();
+				while (parents.hasNext()) {
+					depConnector.insert(parents.next());
+				}
+			}
 		} catch (SQLException e) {
 			throw new StorageException(e.getMessage());
 		}
@@ -43,43 +53,50 @@ public class StorageSQLLite implements ISynapseStorage {
 	}
 
 	@Override
-	public List<String> findNameList(String type) throws StorageException {
+	public List<MediatorItem> findMediatorList(String type) throws StorageException {
 		List<SynapseElement> elements;
 		try {
 			elements = connector.find(Collections.singletonMap("type", type));
-			if(elements==null){
+			if (elements == null) {
 				return null;
 			}
-			List<String> result = new ArrayList<String>();
+			List<MediatorItem> result = new ArrayList<MediatorItem>();
 			Iterator<SynapseElement> _iterator = elements.iterator();
-			while(_iterator.hasNext()){
-				result.add(_iterator.next().getName());
+			while (_iterator.hasNext()) {
+				SynapseElement element = _iterator.next();
+				MediatorItem item = new MediatorItem();
+				item.name = element.getName();
+
+				element.getParents().iterator().forEachRemaining(_item -> {
+					item.parents.add(_item.getParentElement().getName());
+				});
+
+				result.add(item);
 			}
 			return result;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new StorageException(e.getMessage());
 		}
-		
-	}
 
+	}
 
 	@Override
 	public void clearStorage() throws StorageException {
 		try {
 			connector.deleteAll();
+			depConnector.deleteAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new StorageException(e.getMessage());
 		}
 	}
 
-
 	@Override
 	public List<SynapseElement> searchByName(String term) throws StorageException {
-		QueryBuilder<SynapseElement, String> qb =  connector.createQueryBuilder();
+		QueryBuilder<SynapseElement, String> qb = connector.createQueryBuilder();
 		SelectArg arg = new SelectArg();
-		arg.setValue("%"+term+"%");
+		arg.setValue("%" + term + "%");
 		Where<SynapseElement, String> _where = qb.where();
 		try {
 			_where.like("name", arg);
@@ -88,5 +105,5 @@ public class StorageSQLLite implements ISynapseStorage {
 			throw new StorageException(e.getMessage());
 		}
 	}
-	
+
 }

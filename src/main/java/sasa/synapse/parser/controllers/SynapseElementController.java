@@ -1,7 +1,6 @@
 package sasa.synapse.parser.controllers;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +16,7 @@ import org.json.JSONObject;
 import sasa.authorization.jersey.Security;
 import sasa.synapse.parser.entities.SynapseElement;
 import sasa.synapse.parser.storage.ISynapseStorage;
+import sasa.synapse.parser.storage.MediatorItem;
 import sasa.synapse.parser.storage.StorageException;
 
 @Security
@@ -31,22 +31,30 @@ public class SynapseElementController {
 	public String all(@PathParam("type") String type){
 		JSONObject obj = new JSONObject();
 		try {
-			List<String> _list = storage.findNameList(type);
+			List<MediatorItem> _list = storage.findMediatorList(type);
 			if(_list!=null){
-				_list.sort(new Comparator<String>() {
+				_list.sort(new Comparator<MediatorItem>() {
 
 					@Override
-					public int compare(String o1, String o2) {
+					public int compare(MediatorItem o1, MediatorItem o2) {
 						
-						return o1.compareTo(o2);
+						return o1.name.compareTo(o2.name);
 					}
 				});
-				Iterator<String> list = _list.iterator();
 				JSONArray names = new JSONArray();
-				while(list.hasNext()){
-					names.put(list.next());
-				}
+				_list.forEach(item->{
+					JSONObject row = new JSONObject();
+					row.put("name", item.name);
+					JSONArray parents = new JSONArray();
+					row.put("parents", parents);
+					item.parents.forEach(p->{
+						parents.put(p);
+					});
+					names.put(row);
+					
+				});
 				obj.put("names", names);
+				
 			}
 		} catch (StorageException e) {
 			e.printStackTrace();

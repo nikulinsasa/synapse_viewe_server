@@ -1,10 +1,12 @@
 package sasa.synapse.parser.controllers;
 
 
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
 
 import sasa.authorization.jersey.Security;
 import sasa.synapse.parser.creator.DataCreator;
@@ -30,7 +32,9 @@ public class ServicesController {
 		try {
 			storage.clearStorage();
 			DataCreator.createProxiesRows(sl, storage);
-
+			DataCreator.createSequenciesRows(sl, storage);
+			
+			
 		} catch (StorageException e) {
 			e.printStackTrace();
 			return "<error>Проблема с записью</error>";

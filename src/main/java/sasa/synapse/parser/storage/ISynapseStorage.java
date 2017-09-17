@@ -10,7 +10,7 @@ public interface ISynapseStorage {
 	
 	public SynapseElement findSynapseElementByName(String name) throws StorageException;
 	
-	public List<String> findNameList(String type) throws StorageException;
+	public List<MediatorItem> findMediatorList(String type) throws StorageException;
 	
 	public List<SynapseElement> searchByName(String term) throws StorageException;
 	

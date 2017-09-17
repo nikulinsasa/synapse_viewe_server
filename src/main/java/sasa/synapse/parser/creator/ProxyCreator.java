@@ -1,5 +1,7 @@
 package sasa.synapse.parser.creator;
 
+import java.util.HashMap;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -10,10 +12,17 @@ public class ProxyCreator {
 
 	private Node proxy;
 
+	private HashMap<String, Integer> usedSequencies = new HashMap<>();
+	
 	public ProxyCreator(Node proxy) {
 		this.proxy = proxy;
 	}
 
+	/**
+	 * Создаем используемые зависимости в proxy
+	 * @param sequenceContainer
+	 * @return
+	 */
 	public Node create(SynapseContainer sequenceContainer) {
 		Document doc = proxy.getOwnerDocument();
 		
@@ -27,6 +36,7 @@ public class ProxyCreator {
 				if (key != null && item.getFirstChild() == null) {
 					repeat = true;
 					String name = key.getNodeValue();
+					addSqeuency(name);
 					if(sequenceContainer.get(name)!=null){
 						NodeList innerSequence = sequenceContainer.get(name).getChildNodes();
 						for (int j = 0, countTags = innerSequence.getLength(); j < countTags; j++) {
@@ -43,4 +53,20 @@ public class ProxyCreator {
 		return proxy;
 	}
 
+	private void addSqeuency(String name) {
+		
+		if(usedSequencies.get(name)==null){
+			usedSequencies.put(name, new Integer(0));
+		}
+		usedSequencies.put(name,usedSequencies.get(name)+1);
+	}
+	
+	/**
+	 * используемые последовательности
+	 * @return
+	 */
+	public HashMap<String, Integer> getUsedSequencies() {
+		return usedSequencies;
+	}
+	
 }
