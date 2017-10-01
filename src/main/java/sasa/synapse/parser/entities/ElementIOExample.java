@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName="element_descriptions")
+@DatabaseTable(tableName="element_examples")
 public class ElementIOExample implements IElementFromJSON {
 	@DatabaseField(generatedId = true)
 	private int id;

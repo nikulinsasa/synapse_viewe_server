@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 
 import sasa.synapse.parser.entities.IElementFromJSON;
 import sasa.synapse.parser.storage.StorageException;
@@ -30,6 +31,7 @@ public class ElementRestStorage<T extends IElementFromJSON> {
 	
 	public JSONObject create(T obj) throws StorageException {
 		try {
+			connector.createTable();
 			connector.insert(obj);
 			return obj.getJSON();
 		} catch (SQLException e) {
