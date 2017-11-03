@@ -15,10 +15,8 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 import sasa.authorization.jersey.SecurityFilter;
 
-
-public class App 
-{
-    private static int getPort(int defaultPort) {
+public class App {
+	private static int getPort(int defaultPort) {
 		// grab port from environment, otherwise fall back to default port 9998
 		String httpPort = System.getProperty("jersey.test.port");
 		if (null != httpPort) {
@@ -38,13 +36,13 @@ public class App
 
 	protected static HttpServer startServer(String[] args) throws IOException, SQLException {
 		ResourceConfig resourceConfig = new ResourceConfig();
-		resourceConfig.register(new BinderOnlySqlLite(args.length>0 && args[0].equals("INIT")));
-		if(args.length>1){
-			resourceConfig.register(new BinderSynapseElementsStorage(args[1]));			
-		}else{
+		resourceConfig.register(new BinderOnlySqlLite(args.length > 0 && args[0].equals("INIT")));
+		if (args.length > 1) {
+			resourceConfig.register(new BinderSynapseElementsStorage(args[1]));
+		} else {
 			resourceConfig.register(new BinderSynapseElementsStorage());
 		}
-		
+
 		resourceConfig.register(CrossDomainFilter.class);
 		resourceConfig.register(SecurityFilter.class);
 		resourceConfig.packages("sasa.synapse.parser.controllers");
@@ -53,9 +51,24 @@ public class App
 
 		HttpServer server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI);
 
+		
+
 		WebappContext context = new WebappContext("WebappContext");
 		ServletRegistration registration = context.addServlet("ServletContainer", new ServletContainer(resourceConfig));
 		registration.addMapping("/*");
+		
+		server.getServerConfiguration().addHttpHandler(
+				new org.glassfish.grizzly.http.server.CLStaticHttpHandler(App.class.getClassLoader(), "/webapp/static/"),
+				"/static");
+		server.getServerConfiguration().addHttpHandler(
+				new org.glassfish.grizzly.http.server.CLStaticHttpHandler(App.class.getClassLoader(), "/webapp/icons/"),
+				"/icons");
+		
+		String[] urls = {"/","/endpoint","/proxy-list","/sequence-list"};
+		server.getServerConfiguration().addHttpHandler(
+				new org.glassfish.grizzly.http.server.CLStaticHttpHandler(App.class.getClassLoader(), "/webapp/"),
+				urls);
+		
 		context.deploy(server);
 		return server;
 	}

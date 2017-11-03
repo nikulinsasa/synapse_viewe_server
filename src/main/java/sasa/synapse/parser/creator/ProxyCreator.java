@@ -2,6 +2,7 @@ package sasa.synapse.parser.creator;
 
 import java.util.HashMap;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,6 +26,19 @@ public class ProxyCreator {
 	 */
 	public Node create(SynapseContainer sequenceContainer) {
 		Document doc = proxy.getOwnerDocument();
+		
+		Node inSequncy = proxy.getAttributes().getNamedItem("inSequence");
+		Node outSequncy = proxy.getAttributes().getNamedItem("outSequence");
+		Node faultSequence = proxy.getAttributes().getNamedItem("faultSequence");
+		if(inSequncy!=null) {
+			appendSequency(doc, "inSequence", inSequncy);
+		}
+		if(outSequncy!=null) {
+			appendSequency(doc, "outSequncy", outSequncy);
+		}
+		if(faultSequence!=null) {
+			appendSequency(doc, "faultSequence", faultSequence);
+		}
 		
 		boolean repeat;
 		do {
@@ -53,6 +67,15 @@ public class ProxyCreator {
 		return proxy;
 	}
 
+	private void appendSequency(Document doc, String name, Node source) {
+		Node inSequencyForProxy = doc.createElement(name);
+		Node sequency = doc.createElement("sequency");
+		Attr attr = doc.createAttribute("key");
+		attr.setValue(source.getNodeValue());
+		sequency.appendChild(attr);
+		inSequencyForProxy.appendChild(sequency);
+	}
+	
 	private void addSqeuency(String name) {
 		
 		if(usedSequencies.get(name)==null){
